@@ -13,8 +13,8 @@ resources:
     cpu: "1000m"
     memory: "2Gi"
 
-# JVM heap settings
-esJavaOpts: "-Xmx512m -Xms512m"
+# JVM heap settings with cgroup fix
+esJavaOpts: "-Xmx512m -Xms512m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.security.policy=all.policy"
 
 # Volume configuration
 volumeClaimTemplate:

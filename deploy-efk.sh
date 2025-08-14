@@ -17,6 +17,8 @@ helm repo update
 
 # Deploy Elasticsearch (7.x by default)
 echo "🔍 Deploying Elasticsearch..."
+# Remove existing deployment if it exists
+helm uninstall elasticsearch -n logging 2>/dev/null || true
 helm install elasticsearch elastic/elasticsearch \
   --namespace logging \
   --values elasticsearch-values.yaml \
