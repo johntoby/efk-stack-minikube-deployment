@@ -1,56 +1,36 @@
-# elasticsearch-values.yaml
----
-# Minikube optimized settings
+# elasticsearch-values.yaml - Minikube optimized
 replicas: 1
 minimumMasterNodes: 1
 
-# Resource configuration for Minikube
 resources:
   requests:
+    cpu: "100m"
+    memory: "512Mi"
+  limits:
     cpu: "500m"
     memory: "1Gi"
-  limits:
-    cpu: "1000m"
-    memory: "2Gi"
 
-# JVM heap settings with cgroup fix
-esJavaOpts: "-Xmx512m -Xms512m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.security.policy=all.policy"
+esJavaOpts: "-Xmx256m -Xms256m"
 
-# Volume configuration - disable for Minikube
 persistence:
   enabled: false
 
-# Single node cluster configuration
 clusterName: "elasticsearch"
 nodeGroup: "master"
 
-# Disable security for simplicity
 xpack:
   security:
     enabled: false
 
-# Service configuration
-service:
-  type: ClusterIP
-  ports:
-    - name: http
-      protocol: TCP
-      port: 9200
-    - name: transport
-      protocol: TCP
-      port: 9300
-
-# Health checks
-readinessProbe:
-  failureThreshold: 3
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  successThreshold: 3
-  timeoutSeconds: 5
-
-# Disable anti-affinity for single node
 antiAffinity: "soft"
 
-# Sysctls for Elasticsearch
 sysctlInitContainer:
   enabled: false
+
+esConfig:
+  elasticsearch.yml: |
+    cluster.name: "elasticsearch"
+    network.host: 0.0.0.0
+    discovery.type: single-node
+    xpack.security.enabled: false
+    xpack.monitoring.collection.enabled: false
