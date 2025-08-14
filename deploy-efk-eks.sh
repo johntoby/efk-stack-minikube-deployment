@@ -5,6 +5,10 @@ set -e
 
 echo "🚀 Starting EFK Stack deployment to AWS EKS..."
 
+# Verify EKS connection
+echo "🔍 Verifying EKS cluster connection..."
+kubectl cluster-info
+
 # Create namespace
 echo "📁 Creating logging namespace..."
 kubectl create namespace logging --dry-run=client -o yaml | kubectl apply -f -
@@ -15,18 +19,16 @@ helm repo add elastic https://helm.elastic.co
 helm repo add fluent https://fluent.github.io/helm-charts
 helm repo update
 
-# Deploy Elasticsearch (7.x by default)
-echo "🔍 Deploying Elasticsearch..."
-# Remove existing deployment if it exists
-helm uninstall elasticsearch -n logging 2>/dev/null || true
+# Deploy Elasticsearch
+echo "🔍 Deploying Elasticsearch cluster..."
 helm install elasticsearch elastic/elasticsearch \
   --namespace logging \
   --values elasticsearch-values.yaml \
   --version 7.17.3
 
 # Wait for Elasticsearch to be ready
-echo "⏳ Waiting for Elasticsearch to be ready..."
-kubectl wait --for=condition=ready pod -l app=elasticsearch-master -n logging --timeout=300s
+echo "⏳ Waiting for Elasticsearch cluster to be ready..."
+kubectl wait --for=condition=ready pod -l app=elasticsearch-master -n logging --timeout=600s
 
 # Deploy Kibana
 echo "📊 Deploying Kibana..."
@@ -58,6 +60,8 @@ echo ""
 kubectl get pods -n logging
 echo ""
 echo "🌐 Access Kibana:"
-echo "Get LoadBalancer URL:"
+echo "LoadBalancer URL (wait for provisioning):"
+kubectl get service kibana-kibana -n logging
+echo ""
+echo "Get external URL:"
 echo "kubectl get service kibana-kibana -n logging -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
-echo "Or use port-forward: kubectl port-forward service/kibana-kibana 5601:5601 -n logging"

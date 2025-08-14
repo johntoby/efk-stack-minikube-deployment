@@ -1,19 +1,23 @@
-# elasticsearch-values.yaml - Minikube optimized
-replicas: 1
-minimumMasterNodes: 1
+# elasticsearch-values.yaml - AWS EKS optimized
+replicas: 3
+minimumMasterNodes: 2
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "512Mi"
+    cpu: "1000m"
+    memory: "2Gi"
   limits:
-    cpu: "500m"
-    memory: "1Gi"
+    cpu: "2000m"
+    memory: "4Gi"
 
-esJavaOpts: "-Xmx256m -Xms256m"
+esJavaOpts: "-Xmx1g -Xms1g"
 
-persistence:
-  enabled: false
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "gp2"
+  resources:
+    requests:
+      storage: 30Gi
 
 clusterName: "elasticsearch"
 nodeGroup: "master"
@@ -22,15 +26,11 @@ xpack:
   security:
     enabled: false
 
-antiAffinity: "soft"
-
-sysctlInitContainer:
-  enabled: false
+antiAffinity: "hard"
 
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
     network.host: 0.0.0.0
-    discovery.type: single-node
     xpack.security.enabled: false
-    xpack.monitoring.collection.enabled: false
+    cluster.initial_master_nodes: elasticsearch-master-0,elasticsearch-master-1,elasticsearch-master-2

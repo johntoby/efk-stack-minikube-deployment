@@ -1,26 +1,22 @@
-# kibana-values.yaml
----
-# Resource configuration for Minikube
+# kibana-values.yaml - AWS EKS optimized
 resources:
   requests:
-    cpu: "200m"
-    memory: "512Mi"
-  limits:
     cpu: "500m"
     memory: "1Gi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
 
-# Elasticsearch connection
 elasticsearchHosts: "http://elasticsearch-master:9200"
 
-# Service configuration using ClusterIP
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 5601
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 
-# Health checks
 healthCheckPath: "/app/kibana"
 
-# Basic configuration
 kibanaConfig:
   kibana.yml: |
     server.host: "0.0.0.0"
@@ -28,7 +24,6 @@ kibanaConfig:
     elasticsearch.hosts: [ "http://elasticsearch-master:9200" ]
     monitoring.ui.container.elasticsearch.enabled: true
 
-# Security settings
 podSecurityContext:
   fsGroup: 1000
 
@@ -39,10 +34,8 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 1000
 
-# Single replica for Minikube
-replicas: 1
+replicas: 2
 
-# Environment variables
 env:
   - name: SERVER_HOST
     value: "0.0.0.0"
