@@ -1,0 +1,68 @@
+# elasticsearch-8x-values.yaml
+---
+# Minikube optimized settings
+replicas: 1
+minimumMasterNodes: 1
+
+# Resource configuration for Minikube
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+# Volume configuration
+volumeClaimTemplate:
+  accessModes: [ "ReadWriteOnce" ]
+  storageClassName: "standard"
+  resources:
+    requests:
+      storage: 5Gi
+
+# Single node cluster configuration
+clusterName: "elasticsearch"
+nodeGroup: "master"
+
+# Elasticsearch 8.x configuration with security disabled
+esConfig:
+  elasticsearch.yml: |
+    discovery.type: single-node
+    xpack.security.enabled: false
+    xpack.security.enrollment.enabled: false
+    xpack.security.http.ssl.enabled: false
+    xpack.security.transport.ssl.enabled: false
+
+# Environment variables
+extraEnvs:
+  - name: ES_JAVA_OPTS
+    value: "-Xms512m -Xmx512m"
+  - name: discovery.type
+    value: single-node
+
+# Service configuration
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9200
+    - name: transport
+      protocol: TCP
+      port: 9300
+
+# Health checks
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  successThreshold: 3
+  timeoutSeconds: 5
+
+# Disable anti-affinity for single node
+antiAffinity: "soft"
+
+# Sysctls for Elasticsearch
+sysctlInitContainer:
+  enabled: false
