@@ -24,6 +24,13 @@ xpack:
 
 antiAffinity: "soft"
 
+sysctlInitContainer:
+  enabled: true
+
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
