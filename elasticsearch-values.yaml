@@ -16,13 +16,9 @@ resources:
 # JVM heap settings with cgroup fix
 esJavaOpts: "-Xmx512m -Xms512m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.security.policy=all.policy"
 
-# Volume configuration
-volumeClaimTemplate:
-  accessModes: [ "ReadWriteOnce" ]
-  storageClassName: "standard"
-  resources:
-    requests:
-      storage: 5Gi
+# Volume configuration - disable for Minikube
+persistence:
+  enabled: false
 
 # Single node cluster configuration
 clusterName: "elasticsearch"
