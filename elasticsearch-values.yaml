@@ -1,23 +1,19 @@
-# elasticsearch-values.yaml - AWS EKS optimized
-replicas: 3
-minimumMasterNodes: 2
+# elasticsearch-values.yaml - Single node for testing
+replicas: 1
+minimumMasterNodes: 1
 
 resources:
   requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
     cpu: "1000m"
     memory: "2Gi"
-  limits:
-    cpu: "2000m"
-    memory: "4Gi"
 
-esJavaOpts: "-Xmx1g -Xms1g"
+esJavaOpts: "-Xmx512m -Xms512m"
 
-volumeClaimTemplate:
-  accessModes: ["ReadWriteOnce"]
-  storageClassName: "gp2"
-  resources:
-    requests:
-      storage: 30Gi
+persistence:
+  enabled: false
 
 clusterName: "elasticsearch"
 nodeGroup: "master"
@@ -26,11 +22,11 @@ xpack:
   security:
     enabled: false
 
-antiAffinity: "hard"
+antiAffinity: "soft"
 
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
     network.host: 0.0.0.0
+    discovery.type: single-node
     xpack.security.enabled: false
-    cluster.initial_master_nodes: elasticsearch-master-0,elasticsearch-master-1,elasticsearch-master-2
